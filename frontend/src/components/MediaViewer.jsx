@@ -57,7 +57,8 @@ const MediaViewer = ({ file, seekTime }) => {
         </div>
 
         <div style={{ 
-          aspectRatio: '4/5', 
+          flex: 1,
+          minHeight: '200px',
           background: '#000', 
           borderRadius: '16px', 
           overflow: 'hidden', 
