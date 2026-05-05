@@ -65,7 +65,7 @@ Question: {question}"""
     return response.content
 
 def summarize_content(content):
-    llm = ChatGroq(model_name="llama3-8b-8192", temperature=0)
+    llm = ChatGroq(model_name="llama-3.1-8b-instant", temperature=0)
     prompt = f"Summarize this:\n\n{content[:8000]}"
     response = llm.invoke([HumanMessage(content=prompt)])
     return response.content
