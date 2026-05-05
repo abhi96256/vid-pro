@@ -22,7 +22,7 @@ body {
   background: radial-gradient(circle at top right, #0f172a, #020617);
   color: var(--text-primary);
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Premium Scrollbar */
