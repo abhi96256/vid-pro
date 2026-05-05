@@ -94,8 +94,15 @@ const MediaViewer = ({ file, seekTime }) => {
       </div>
 
       {/* Intelligence/Summary Card */}
-      <div className="glass-card" style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+      <div className="glass-card" style={{ 
+        flex: '1 1 300px', // Allow it to grow but give it a base height
+        padding: '24px', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: 0, 
+        overflow: 'hidden' // Contain children
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexShrink: 0 }}>
           <Info size={18} color="var(--accent-primary)" />
           <h4 style={{ fontSize: '1rem', fontWeight: 700 }}>AI Intelligence Report</h4>
         </div>
@@ -110,7 +117,8 @@ const MediaViewer = ({ file, seekTime }) => {
           fontSize: '0.9rem',
           lineHeight: '1.7',
           color: '#cbd5e1',
-          whiteSpace: 'pre-wrap'
+          whiteSpace: 'pre-wrap',
+          scrollbarWidth: 'thin'
         }}>
           <div style={{ 
             padding: '4px 10px', 
@@ -120,7 +128,8 @@ const MediaViewer = ({ file, seekTime }) => {
             fontSize: '0.75rem', 
             fontWeight: 600, 
             display: 'inline-block',
-            marginBottom: '12px'
+            marginBottom: '12px',
+            flexShrink: 0
           }}>
             EXECUTIVE SUMMARY
           </div>
