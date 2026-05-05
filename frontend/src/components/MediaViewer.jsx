@@ -53,7 +53,7 @@ const MediaViewer = ({ file, seekTime }) => {
         }}>
           {file.file_type === 'pdf' ? (
             <iframe 
-              src={`${fileUrl}#toolbar=0`} 
+              src={`https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`} 
               title="PDF Preview"
               style={{ width: '100%', height: '100%', border: 'none' }}
             />
