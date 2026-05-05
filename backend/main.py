@@ -141,7 +141,7 @@ async def upload_file(
     return db_file
 
 @app.delete("/files/{file_id}")
-def delete_file(file_id: str, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+def delete_file(file_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     file_record = db.query(models.FileRecord).filter(models.FileRecord.id == file_id, models.FileRecord.owner_id == current_user.id).first()
     if not file_record:
         raise HTTPException(status_code=404, detail="File not found")

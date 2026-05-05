@@ -69,16 +69,22 @@ const MediaViewer = ({ file, seekTime }) => {
           position: 'relative'
         }}>
           {file.file_type === 'pdf' ? (
-            <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-              <iframe 
-                src={pdfViewerUrl} 
-                title="PDF Preview"
-                style={{ width: '100%', height: '100%', border: 'none' }}
-                onError={() => setPdfError(true)}
+            <div style={{ width: '100%', height: '100%', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <img 
+                src={fileUrl.replace(/\.pdf$/, '.jpg')} 
+                alt="PDF Preview"
+                style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  setPdfError(true);
+                }}
               />
-              <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', pointerEvents: 'none', opacity: 0.5, fontSize: '0.7rem' }}>
-                Powered by Google Docs
-              </div>
+              {pdfError && (
+                <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                  <FileText size={48} style={{ marginBottom: '10px', opacity: 0.3, margin: '0 auto' }} />
+                  <p>Preview not available</p>
+                </div>
+              )}
             </div>
           ) : file.file_type === 'audio' ? (
             <div style={{ width: '100%', padding: '20px', textAlign: 'center' }}>
