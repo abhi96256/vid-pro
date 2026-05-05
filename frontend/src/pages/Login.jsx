@@ -18,7 +18,7 @@ const Login = () => {
     try {
       const data = await authService.login(email, password);
       localStorage.setItem('token', data.access_token);
-      navigate('/dashboard');
+      window.location.href = '/dashboard';
     } catch (err) {
       setError('Invalid email or password. Please try again.');
     } finally {
