@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { FileText, Music, Video as VideoIcon, Info, Layout } from 'lucide-react';
+import { FileText, Music, Video as VideoIcon, Info, Layout, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const MediaViewer = ({ file, seekTime }) => {
@@ -15,10 +15,13 @@ const MediaViewer = ({ file, seekTime }) => {
   if (!file) return null;
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-  const fileUrl = file?.file_path ? `${API_URL}/${file.file_path.replace(/\\/g, '/')}` : '';
+  
+  // Fix the URL logic: Vercel mounts /tmp/uploads to /uploads path
+  const fileName = file.file_path.split(/[\\/]/).pop();
+  const fileUrl = `${API_URL}/uploads/${fileName}`;
 
   return (
-    <div style={{ width: '420px', height: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div style={{ width: '440px', height: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Media Player Card */}
       <div className="glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: '0 0 auto' }}>
         <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -36,21 +39,23 @@ const MediaViewer = ({ file, seekTime }) => {
         </div>
 
         <div style={{ 
-          aspectRatio: '16/9', 
+          aspectRatio: '4/5', 
           background: '#000', 
-          borderRadius: '12px', 
+          borderRadius: '16px', 
           overflow: 'hidden', 
           display: 'flex', 
           justifyContent: 'center', 
           alignItems: 'center',
           boxShadow: 'inset 0 0 40px rgba(0,0,0,0.5)',
-          border: '1px solid var(--border-glass)'
+          border: '1px solid var(--border-glass)',
+          position: 'relative'
         }}>
           {file.file_type === 'pdf' ? (
-            <div style={{ textAlign: 'center', padding: '20px' }}>
-              <FileText size={48} color="rgba(255,255,255,0.1)" style={{ marginBottom: '16px' }} />
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Full PDF Preview available in Pro version</p>
-            </div>
+            <iframe 
+              src={`${fileUrl}#toolbar=0`} 
+              title="PDF Preview"
+              style={{ width: '100%', height: '100%', border: 'none' }}
+            />
           ) : file.file_type === 'audio' ? (
             <div style={{ width: '100%', padding: '20px', textAlign: 'center' }}>
               <Music size={40} color="var(--accent-primary)" style={{ marginBottom: '20px', opacity: 0.5 }} />
@@ -64,6 +69,27 @@ const MediaViewer = ({ file, seekTime }) => {
             </video>
           )}
         </div>
+        
+        {file.file_type === 'pdf' && (
+          <a 
+            href={fileUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ 
+              marginTop: '12px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              gap: '6px', 
+              fontSize: '0.8rem', 
+              color: 'var(--accent-primary)', 
+              textDecoration: 'none',
+              fontWeight: 600
+            }}
+          >
+            <ExternalLink size={14} /> Open Full PDF in New Tab
+          </a>
+        )}
       </div>
 
       {/* Intelligence/Summary Card */}
@@ -98,17 +124,6 @@ const MediaViewer = ({ file, seekTime }) => {
             EXECUTIVE SUMMARY
           </div>
           {file.summary || "Analyzing content to generate executive intelligence report..."}
-        </div>
-        
-        <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
-          <div style={{ flex: 1, padding: '10px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', textAlign: 'center' }}>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Status</div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#34d399' }}>Processed</div>
-          </div>
-          <div style={{ flex: 1, padding: '10px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', textAlign: 'center' }}>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>AI Model</div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--accent-secondary)' }}>Llama 3.3</div>
-          </div>
         </div>
       </div>
     </div>
