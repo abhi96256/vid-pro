@@ -29,9 +29,8 @@ const FileUploader = ({ isOpen, onClose, onUploadSuccess }) => {
     onDrop,
     accept: {
       'application/pdf': ['.pdf'],
-      'audio/mpeg': ['.mp3'],
-      'audio/wav': ['.wav'],
-      'video/mp4': ['.mp4']
+      'audio/*': ['.mp3', '.wav'],
+      'video/*': ['.mp4']
     },
     multiple: false
   });
