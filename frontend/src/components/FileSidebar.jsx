@@ -1,8 +1,22 @@
 import React from 'react';
-import { Plus, FileText, Music, Video, ChevronRight, Clock } from 'lucide-react';
+import { Plus, FileText, Music, Video, ChevronRight, Clock, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { fileService } from '../services/api';
 
-const FileSidebar = ({ files, onFileSelect, selectedFileId, onUploadClick }) => {
+const FileSidebar = ({ files, onFileSelect, selectedFileId, onUploadClick, onFilesUpdate }) => {
+  
+  const handleDelete = async (e, fileId) => {
+    e.stopPropagation(); // Prevent file selection when clicking delete
+    if (!window.confirm('Are you sure you want to delete this file?')) return;
+    
+    try {
+      await fileService.deleteFile(fileId);
+      onFilesUpdate(); // Refresh the list
+    } catch (err) {
+      alert('Failed to delete file');
+    }
+  };
+
   return (
     <aside className="glass-card" style={{ 
       width: '320px', 
@@ -56,7 +70,8 @@ const FileSidebar = ({ files, onFileSelect, selectedFileId, onUploadClick }) => 
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                transition: 'all 0.2s'
+                transition: 'all 0.2s',
+                position: 'relative'
               }}
               className="sidebar-item"
             >
@@ -92,6 +107,22 @@ const FileSidebar = ({ files, onFileSelect, selectedFileId, onUploadClick }) => 
                 </div>
               </div>
 
+              <button 
+                className="delete-btn"
+                onClick={(e) => handleDelete(e, file.id)}
+                style={{ 
+                  background: 'none', 
+                  border: 'none', 
+                  color: '#ef4444', 
+                  padding: '6px', 
+                  cursor: 'pointer',
+                  opacity: 0,
+                  transition: 'opacity 0.2s'
+                }}
+              >
+                <Trash2 size={16} />
+              </button>
+
               {selectedFileId === file.id && (
                 <motion.div layoutId="active-indicator">
                   <ChevronRight size={16} color="var(--accent-primary)" />
@@ -106,6 +137,9 @@ const FileSidebar = ({ files, onFileSelect, selectedFileId, onUploadClick }) => 
         .sidebar-item:hover {
           background: rgba(255, 255, 255, 0.05) !important;
           transform: translateX(4px);
+        }
+        .sidebar-item:hover .delete-btn {
+          opacity: 1 !important;
         }
         .hover-scale:hover {
           transform: scale(1.1);

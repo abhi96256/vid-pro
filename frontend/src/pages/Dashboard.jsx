@@ -96,6 +96,7 @@ const Dashboard = () => {
           onFileSelect={setSelectedFile} 
           selectedFileId={selectedFile?.id} 
           onUploadClick={() => setIsUploaderOpen(true)} 
+          onFilesUpdate={loadFiles}
         />
         
         <main style={{ flex: 1, display: 'flex', gap: '20px', minWidth: 0 }}>

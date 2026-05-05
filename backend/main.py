@@ -140,9 +140,15 @@ async def upload_file(
     
     return db_file
 
-@app.get("/files", response_model=List[schemas.FileRecord])
-def list_files(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return db.query(models.FileRecord).filter(models.FileRecord.owner_id == current_user.id).all()
+@app.delete("/files/{file_id}")
+def delete_file(file_id: str, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    file_record = db.query(models.FileRecord).filter(models.FileRecord.id == file_id, models.FileRecord.owner_id == current_user.id).first()
+    if not file_record:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    db.delete(file_record)
+    db.commit()
+    return {"message": "File deleted successfully"}
 
 # --- CHAT ---
 

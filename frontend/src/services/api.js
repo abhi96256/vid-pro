@@ -41,6 +41,10 @@ export const fileService = {
     const response = await api.get('/files');
     return response.data;
   },
+  deleteFile: async (fileId) => {
+    const response = await api.delete(`/files/${fileId}`);
+    return response.data;
+  },
 };
 
 export const chatService = {
