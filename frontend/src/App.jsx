@@ -5,9 +5,16 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import './index.css';
 
-const App = () => {
-  const isAuthenticated = !!localStorage.getItem('token');
+// Protected Route Component to handle dynamic authentication
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
+const App = () => {
   return (
     <Router>
       <Routes>
@@ -15,9 +22,13 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route 
           path="/dashboard" 
-          element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } 
         />
-        <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Router>
   );
