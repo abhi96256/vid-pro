@@ -69,11 +69,11 @@ const MediaViewer = ({ file, seekTime }) => {
           position: 'relative'
         }}>
           {file.file_type === 'pdf' ? (
-            <div style={{ width: '100%', height: '100%', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ width: '100%', height: '100%', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#1e293b' }}>
               <img 
-                src={fileUrl.replace(/\.pdf$/, '.jpg')} 
+                src={fileUrl.includes('cloudinary.com') ? fileUrl.replace(/\/upload\//, '/upload/w_600,h_800,c_fill,pg_1,f_jpg/') : fileUrl} 
                 alt="PDF Preview"
-                style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }}
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 onError={(e) => {
                   e.target.style.display = 'none';
                   setPdfError(true);
@@ -82,7 +82,8 @@ const MediaViewer = ({ file, seekTime }) => {
               {pdfError && (
                 <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-secondary)' }}>
                   <FileText size={48} style={{ marginBottom: '10px', opacity: 0.3, margin: '0 auto' }} />
-                  <p>Preview not available</p>
+                  <p>Preview not available for this file.</p>
+                  <p style={{ fontSize: '0.75rem' }}>Try uploading a new file.</p>
                 </div>
               )}
             </div>
