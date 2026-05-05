@@ -11,6 +11,8 @@ Developed for the SDE-1 Programming Assignment. This application features a prem
 - **Advanced RAG**: Semantic search on documents and media using FAISS and Groq (Llama 3.3).
 - **Multimedia Intelligence**: Automatic transcription of Video/Audio using Groq Whisper-v3.
 - **Permanent Cloud Storage**: Integrated with **Cloudinary** for persistent media hosting.
+- **File Management**: Full CRUD support—upload and **delete** files directly from the sidebar.
+- **Robust Media Preview**: Intelligent PDF rendering with Google Docs Viewer and direct-link fallbacks.
 - **Stateless Stability**: Re-creates vector stores on-the-fly from **Supabase** data, ensuring 100% reliability on Vercel.
 - **Timestamp Navigation**: AI detects timestamps and provides "Jump to Scene" buttons in chat.
 - **Executive Summaries**: Instant highlights and key points for all uploaded files.
