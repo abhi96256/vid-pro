@@ -16,9 +16,10 @@ const MediaViewer = ({ file, seekTime }) => {
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
   
-  // Fix the URL logic: Vercel mounts /tmp/uploads to /uploads path
-  const fileName = file?.file_path ? file.file_path.split(/[\\/]/).pop() : '';
-  const fileUrl = fileName ? `${API_URL}/uploads/${fileName}` : '';
+  // Check if file_path is already a full URL (Cloudinary) or a local path
+  const fileUrl = file?.file_path?.startsWith('http') 
+    ? file.file_path 
+    : (file?.file_path ? `${API_URL}/uploads/${file.file_path.split(/[\\/]/).pop()}` : '');
 
   return (
     <div style={{ width: '440px', height: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>

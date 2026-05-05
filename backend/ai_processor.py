@@ -51,13 +51,24 @@ def process_file_content(file_id, content, file_type):
 
     return store_path
 
-def get_answer(file_id, question):
+def get_answer(file_id, question, content=None):
     embeddings = DeterministicFakeEmbedding(size=768)
-    vector_store = FAISS.load_local(
-        f"/tmp/vector_stores/{file_id}",
-        embeddings,
-        allow_dangerous_deserialization=True
-    )
+    store_path = f"/tmp/vector_stores/{file_id}"
+    
+    # Fallback: If index is missing (common on Vercel), re-create it from content
+    if not os.path.exists(store_path) and content:
+        print(f"Re-creating missing index for {file_id}...")
+        process_file_content(file_id, content, "fallback")
+    
+    try:
+        vector_store = FAISS.load_local(
+            store_path,
+            embeddings,
+            allow_dangerous_deserialization=True
+        )
+    except Exception as e:
+        print(f"Error loading vector store: {str(e)}")
+        return "Sorry, I am having trouble accessing the file context. Please try re-uploading."
 
     docs = vector_store.similarity_search(question, k=5)
     context = "\n\n".join([doc.page_content for doc in docs])

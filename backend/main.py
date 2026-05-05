@@ -11,6 +11,16 @@ from datetime import timedelta
 
 import models, schemas, database, auth, ai_processor
 from database import engine, get_db
+import cloudinary
+import cloudinary.uploader
+
+# Cloudinary Configuration
+cloudinary.config( 
+  cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME", "dpopbcumz"), 
+  api_key = os.getenv("CLOUDINARY_API_KEY", "391939812487991"), 
+  api_secret = os.getenv("CLOUDINARY_API_SECRET", "-qxGczK25KlfsRh5K9jpzBFL0nc"),
+  secure = True
+)
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -87,6 +97,16 @@ async def upload_file(
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
+    # 2. Upload to Cloudinary
+    try:
+        # Use 'raw' for PDF to preserve extension, 'video' for mp4/audio
+        resource_type = "raw" if ext.lower() == "pdf" else "auto"
+        upload_result = cloudinary.uploader.upload(file_path, resource_type=resource_type)
+        cloudinary_url = upload_result.get("secure_url")
+    except Exception as e:
+        print(f"Cloudinary upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Cloud storage upload failed")
+
     file_type = "pdf" if ext.lower() == "pdf" else "audio" if ext.lower() in ["mp3", "wav"] else "video"
     
     content = ""
@@ -101,10 +121,10 @@ async def upload_file(
 
     summary = ai_processor.summarize_content(content[:5000]) # Limit content for summary
     
-    # Create record
+    # Create record with Cloudinary URL
     db_file = models.FileRecord(
         filename=file.filename,
-        file_path=file_path,
+        file_path=cloudinary_url, # Now storing full Cloudinary URL
         file_type=file_type,
         summary=summary,
         transcription=content,
@@ -141,8 +161,8 @@ def chat_with_file(
     user_msg = models.ChatMessage(content=message.content, role="user", file_id=file_id)
     db.add(user_msg)
     
-    # Get AI answer
-    answer = ai_processor.get_answer(file_id, message.content)
+    # Get AI answer (with fallback content)
+    answer = ai_processor.get_answer(file_id, message.content, file_record.transcription)
     
     # Save assistant message
     assistant_msg = models.ChatMessage(content=answer, role="assistant", file_id=file_id)
