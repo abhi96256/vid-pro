@@ -20,13 +20,22 @@ def extract_text_from_pdf(pdf_path):
     return text
 
 def transcribe_audio_video(file_path):
-    with open(file_path, "rb") as file:
-        transcription = client.audio.transcriptions.create(
-            file=(os.path.basename(file_path), file.read()),
-            model="whisper-large-v3",
-            response_format="verbose_json",
-        )
-    return transcription
+    try:
+        with open(file_path, "rb") as file:
+            transcription = client.audio.transcriptions.create(
+                file=(os.path.basename(file_path), file.read()),
+                model="whisper-large-v3",
+                response_format="verbose_json",
+            )
+        return transcription
+    except Exception as e:
+        print(f"Transcription error: {str(e)}")
+        # Return a dummy object with empty text and segments to prevent crash
+        class DummyTranscript:
+            def __init__(self):
+                self.text = "No audio track found or transcription failed."
+                self.segments = []
+        return DummyTranscript()
 
 def process_file_content(file_id, content, file_type):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)

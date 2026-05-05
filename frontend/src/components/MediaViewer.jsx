@@ -17,8 +17,8 @@ const MediaViewer = ({ file, seekTime }) => {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
   
   // Fix the URL logic: Vercel mounts /tmp/uploads to /uploads path
-  const fileName = file.file_path.split(/[\\/]/).pop();
-  const fileUrl = `${API_URL}/uploads/${fileName}`;
+  const fileName = file?.file_path ? file.file_path.split(/[\\/]/).pop() : '';
+  const fileUrl = fileName ? `${API_URL}/uploads/${fileName}` : '';
 
   return (
     <div style={{ width: '440px', height: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>

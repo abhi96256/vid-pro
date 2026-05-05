@@ -151,7 +151,7 @@ const FileUploader = ({ isOpen, onClose, onUploadSuccess }) => {
                     {isDragActive ? "Release to process" : "Drop your file here"}
                   </h4>
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                    Maximum file size: 50MB
+                    Maximum file size: 4MB (Vercel Free Limit)
                   </p>
                 </motion.div>
               )}
