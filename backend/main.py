@@ -99,8 +99,8 @@ async def upload_file(
     
     # 2. Upload to Cloudinary
     try:
-        # Use 'raw' for PDF to preserve extension, 'video' for mp4/audio
-        resource_type = "raw" if ext.lower() == "pdf" else "auto"
+        # Use 'image' for PDF to enable JPG previews, 'auto' for others
+        resource_type = "image" if ext.lower() == "pdf" else "auto"
         upload_result = cloudinary.uploader.upload(file_path, resource_type=resource_type)
         cloudinary_url = upload_result.get("secure_url")
     except Exception as e:
@@ -139,6 +139,10 @@ async def upload_file(
     ai_processor.process_file_content(db_file.id, content, file_type)
     
     return db_file
+
+@app.get("/files", response_model=List[schemas.FileRecord])
+def list_files(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return db.query(models.FileRecord).filter(models.FileRecord.owner_id == current_user.id).all()
 
 @app.delete("/files/{file_id}")
 def delete_file(file_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
