@@ -1,9 +1,11 @@
-import React, { useRef, useEffect } from 'react';
-import { FileText, Music, Video as VideoIcon, Info, Layout, ExternalLink } from 'lucide-react';
+import React, { useRef, useEffect, useState } from 'react';
+import { FileText, Music, Video as VideoIcon, Info, Layout, ExternalLink, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const MediaViewer = ({ file, seekTime }) => {
   const mediaRef = useRef(null);
+  const [pdfError, setPdfError] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (seekTime !== null && mediaRef.current) {
@@ -12,18 +14,22 @@ const MediaViewer = ({ file, seekTime }) => {
     }
   }, [seekTime]);
 
+  useEffect(() => {
+    setPdfError(false);
+  }, [file]);
+
   if (!file) return null;
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
   
-  // Check if file_path is already a full URL (Cloudinary) or a local path
   const fileUrl = file?.file_path?.startsWith('http') 
     ? file.file_path 
     : (file?.file_path ? `${API_URL}/uploads/${file.file_path.split(/[\\/]/).pop()}` : '');
 
+  const pdfViewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fileUrl)}&key=${refreshKey}`;
+
   return (
     <div style={{ width: '440px', height: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {/* Media Player Card */}
       <div className="glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: '0 0 auto' }}>
         <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
@@ -34,8 +40,19 @@ const MediaViewer = ({ file, seekTime }) => {
               {file.filename}
             </h3>
           </div>
-          <div style={{ padding: '4px 8px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            {file.file_type}
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {file.file_type === 'pdf' && (
+              <button 
+                onClick={() => setRefreshKey(prev => prev + 1)}
+                style={{ background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '6px', padding: '4px', cursor: 'pointer', color: 'var(--text-secondary)' }}
+                title="Reload Preview"
+              >
+                <RefreshCw size={14} />
+              </button>
+            )}
+            <div style={{ padding: '4px 8px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
+              {file.file_type}
+            </div>
           </div>
         </div>
 
@@ -52,11 +69,17 @@ const MediaViewer = ({ file, seekTime }) => {
           position: 'relative'
         }}>
           {file.file_type === 'pdf' ? (
-            <iframe 
-              src={`https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`} 
-              title="PDF Preview"
-              style={{ width: '100%', height: '100%', border: 'none' }}
-            />
+            <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+              <iframe 
+                src={pdfViewerUrl} 
+                title="PDF Preview"
+                style={{ width: '100%', height: '100%', border: 'none' }}
+                onError={() => setPdfError(true)}
+              />
+              <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', pointerEvents: 'none', opacity: 0.5, fontSize: '0.7rem' }}>
+                Powered by Google Docs
+              </div>
+            </div>
           ) : file.file_type === 'audio' ? (
             <div style={{ width: '100%', padding: '20px', textAlign: 'center' }}>
               <Music size={40} color="var(--accent-primary)" style={{ marginBottom: '20px', opacity: 0.5 }} />
@@ -82,25 +105,27 @@ const MediaViewer = ({ file, seekTime }) => {
               alignItems: 'center', 
               justifyContent: 'center', 
               gap: '6px', 
-              fontSize: '0.8rem', 
+              fontSize: '0.85rem', 
               color: 'var(--accent-primary)', 
               textDecoration: 'none',
-              fontWeight: 600
+              fontWeight: 600,
+              padding: '8px',
+              borderRadius: '8px',
+              background: 'rgba(56, 189, 248, 0.05)'
             }}
           >
-            <ExternalLink size={14} /> Open Full PDF in New Tab
+            <ExternalLink size={14} /> Open Full Document
           </a>
         )}
       </div>
 
-      {/* Intelligence/Summary Card */}
       <div className="glass-card" style={{ 
-        flex: '1 1 300px', // Allow it to grow but give it a base height
+        flex: '1 1 300px',
         padding: '24px', 
         display: 'flex', 
         flexDirection: 'column', 
         minHeight: 0, 
-        overflow: 'hidden' // Contain children
+        overflow: 'hidden'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexShrink: 0 }}>
           <Info size={18} color="var(--accent-primary)" />
