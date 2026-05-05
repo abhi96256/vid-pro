@@ -8,15 +8,20 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
     try {
       await authService.register(email, password);
       navigate('/login');
     } catch (err) {
-      setError('Registration failed. Try again.');
+      setError('Registration failed. This email might already be in use.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -26,92 +31,117 @@ const Register = () => {
       display: 'flex', 
       alignItems: 'center', 
       justifyContent: 'center', 
-      background: 'radial-gradient(circle at 100% 100%, #0f172a 0%, #020617 100%)', 
+      background: 'radial-gradient(circle at center, #1e293b 0%, #020617 100%)', 
       padding: '20px' 
     }}>
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', pointerEvents: 'none', opacity: 0.4 }}>
-        <div style={{ position: 'absolute', bottom: '-10%', left: '-10%', width: '40%', height: '40%', background: 'var(--accent-primary)', filter: 'blur(150px)', borderRadius: '50%' }}></div>
-        <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '40%', height: '40%', background: 'var(--accent-secondary)', filter: 'blur(150px)', borderRadius: '50%' }}></div>
-      </div>
-
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
         className="glass-card"
-        style={{ width: '100%', maxWidth: '440px', padding: '48px', position: 'relative', zIndex: 1 }}
+        style={{ width: '100%', maxWidth: '440px', padding: '48px' }}
       >
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <div style={{ 
-            width: '64px', 
-            height: '64px', 
-            background: 'var(--accent-gradient)', 
-            borderRadius: '16px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            margin: '0 auto 20px auto',
-            boxShadow: '0 0 30px rgba(56, 189, 248, 0.4)'
-          }}>
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            style={{ 
+              display: 'inline-flex',
+              background: 'var(--accent-gradient)', 
+              padding: '16px', 
+              borderRadius: '20px', 
+              boxShadow: '0 10px 25px rgba(56, 189, 248, 0.3)',
+              marginBottom: '24px'
+            }}
+          >
             <Sparkles size={32} color="white" />
-          </div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '8px' }}>Create Account</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Join VidInsight AI today</p>
+          </motion.div>
+          <h2 style={{ fontSize: '2.2rem', fontWeight: 800, marginBottom: '8px' }}>Create Account</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>Start your AI journey with VidInsight today</p>
         </div>
 
         {error && (
-          <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#f87171', padding: '12px', borderRadius: '8px', marginBottom: '24px', fontSize: '0.9rem', textAlign: 'center', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+          <motion.div 
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            style={{ 
+              background: 'rgba(239, 68, 68, 0.1)', 
+              border: '1px solid rgba(239, 68, 68, 0.2)', 
+              color: '#f87171', 
+              padding: '12px', 
+              borderRadius: '10px', 
+              fontSize: '0.85rem', 
+              marginBottom: '24px',
+              textAlign: 'center'
+            }}
+          >
             {error}
-          </div>
+          </motion.div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginLeft: '4px' }}>Email Address</label>
+        <form onSubmit={handleSubmit}>
+          <div className="input-group">
+            <label className="input-label">Email Address</label>
             <div style={{ position: 'relative' }}>
-              <Mail size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+              <Mail size={18} color="var(--text-secondary)" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
               <input 
                 type="email" 
-                placeholder="name@example.com"
                 className="input-field"
+                style={{ paddingLeft: '48px' }}
+                placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                style={{ width: '100%', paddingLeft: '44px' }}
-                required 
+                required
               />
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginLeft: '4px' }}>Password</label>
+          <div className="input-group">
+            <label className="input-label">Password</label>
             <div style={{ position: 'relative' }}>
-              <Lock size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+              <Lock size={18} color="var(--text-secondary)" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
               <input 
                 type="password" 
-                placeholder="At least 8 characters"
                 className="input-field"
+                style={{ paddingLeft: '48px' }}
+                placeholder="At least 8 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={{ width: '100%', paddingLeft: '44px' }}
-                required 
+                required
               />
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '5px' }}>
-            <input type="checkbox" style={{ accentColor: 'var(--accent-primary)' }} required id="terms" />
-            <label htmlFor="terms" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              I agree to the <a href="#" style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>Terms & Privacy Policy</a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
+            <input type="checkbox" id="terms" style={{ accentColor: 'var(--accent-primary)', width: '16px', height: '16px', cursor: 'pointer' }} required />
+            <label htmlFor="terms" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+              I agree to the <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>Terms & Privacy Policy</span>
             </label>
           </div>
 
-          <button type="submit" className="btn-premium" style={{ width: '100%', justifyContent: 'center', marginTop: '10px' }}>
-            Get Started <ArrowRight size={18} />
+          <button 
+            type="submit" 
+            className="btn-premium" 
+            style={{ width: '100%', height: '54px' }}
+            disabled={loading}
+          >
+            {loading ? 'Creating Account...' : (
+              <>
+                Get Started <ArrowRight size={18} />
+              </>
+            )}
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', marginTop: '32px', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-          Already have an account? <Link to="/login" style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 600 }}>Sign In</Link>
-        </p>
+        <div style={{ marginTop: '32px', textAlign: 'center', fontSize: '0.9rem' }}>
+          <span style={{ color: 'var(--text-secondary)' }}>Already have an account? </span>
+          <Link to="/login" style={{ 
+            color: 'var(--accent-primary)', 
+            textDecoration: 'none', 
+            fontWeight: 600
+          }}>
+            Sign In
+          </Link>
+        </div>
       </motion.div>
     </div>
   );

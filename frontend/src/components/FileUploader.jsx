@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Upload, FileText, Music, Video, Loader } from 'lucide-react';
+import { X, Upload, FileText, Music, Video, Loader, Sparkles } from 'lucide-react';
 import { fileService } from '../services/api';
 
 const FileUploader = ({ isOpen, onClose, onUploadSuccess }) => {
@@ -19,7 +19,7 @@ const FileUploader = ({ isOpen, onClose, onUploadSuccess }) => {
       onUploadSuccess(result);
       onClose();
     } catch (err) {
-      setError('Upload failed. Ensure backend is running and OpenAI key is valid.');
+      setError('Upload failed. The AI model might be busy or the file format is unsupported.');
     } finally {
       setUploading(false);
     }
@@ -39,60 +39,169 @@ const FileUploader = ({ isOpen, onClose, onUploadSuccess }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+        <div style={{ 
+          position: 'fixed', 
+          top: 0, left: 0, right: 0, bottom: 0, 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          zIndex: 1000,
+          padding: '20px'
+        }}>
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(4px)' }}
+            style={{ 
+              position: 'absolute', 
+              top: 0, left: 0, right: 0, bottom: 0, 
+              background: 'rgba(2, 6, 23, 0.85)', 
+              backdropFilter: 'blur(12px)' 
+            }}
           />
           <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="glass"
-            style={{ position: 'relative', width: '90%', maxWidth: '500px', padding: '40px', textAlign: 'center' }}
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            className="glass-card"
+            style={{ 
+              position: 'relative', 
+              width: '100%', 
+              maxWidth: '540px', 
+              padding: '40px',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}
           >
-            <button onClick={onClose} style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
-              <X size={24} />
-            </button>
+            <motion.button 
+              whileHover={{ rotate: 90 }}
+              onClick={onClose} 
+              style={{ 
+                position: 'absolute', 
+                top: '24px', 
+                right: '24px', 
+                background: 'rgba(255,255,255,0.05)', 
+                border: 'none', 
+                cursor: 'pointer', 
+                color: 'var(--text-secondary)',
+                padding: '8px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <X size={20} />
+            </motion.button>
             
-            <h2 style={{ marginBottom: '10px' }}>Upload Content</h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>PDF, Audio (MP3/WAV), or Video (MP4)</p>
+            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+              <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center', background: 'rgba(56, 189, 248, 0.1)', padding: '6px 14px', borderRadius: '20px', color: 'var(--accent-primary)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '16px', letterSpacing: '1px' }}>
+                <Sparkles size={14} /> AI Media Processor
+              </div>
+              <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '8px' }}>Upload Content</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Analyze PDF, Audio (MP3/WAV), or Video (MP4)</p>
+            </div>
 
             <div 
               {...getRootProps()} 
               style={{ 
-                border: '2px dashed var(--border-color)', 
-                borderRadius: '16px', 
-                padding: '40px', 
+                border: '2px dashed', 
+                borderRadius: '24px', 
+                padding: '60px 40px', 
                 cursor: 'pointer',
-                background: isDragActive ? 'rgba(56, 189, 248, 0.05)' : 'transparent',
-                borderColor: isDragActive ? 'var(--accent-primary)' : 'var(--border-color)',
-                transition: 'all 0.2s'
+                background: isDragActive ? 'rgba(56, 189, 248, 0.08)' : 'rgba(0,0,0,0.2)',
+                borderColor: isDragActive ? 'var(--accent-primary)' : 'rgba(255,255,255,0.1)',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                textAlign: 'center',
+                position: 'relative',
+                overflow: 'hidden'
               }}
             >
               <input {...getInputProps()} />
+              
               {uploading ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <Loader className="spin" size={48} color="var(--accent-primary)" style={{ marginBottom: '15px' }} />
-                  <p>Processing & Indexing... This may take a minute.</p>
+                  <div style={{ position: 'relative', marginBottom: '20px' }}>
+                    <Loader className="spin" size={60} color="var(--accent-primary)" />
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                       <Upload size={24} color="var(--accent-primary)" style={{ opacity: 0.5 }} />
+                    </div>
+                  </div>
+                  <h4 style={{ fontWeight: 700, marginBottom: '8px' }}>Processing Intelligence...</h4>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Extracting semantic markers and generating summary.</p>
                 </div>
               ) : (
-                <>
-                  <Upload size={48} color="var(--text-muted)" style={{ marginBottom: '15px' }} />
-                  <p>{isDragActive ? "Drop it here!" : "Drag & drop file here, or click to select"}</p>
-                </>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <div style={{ 
+                    width: '80px', 
+                    height: '80px', 
+                    background: 'rgba(56, 189, 248, 0.1)', 
+                    borderRadius: '24px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    margin: '0 auto 24px'
+                  }}>
+                    <Upload size={32} color="var(--accent-primary)" />
+                  </div>
+                  <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '10px' }}>
+                    {isDragActive ? "Release to process" : "Drop your file here"}
+                  </h4>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    Maximum file size: 50MB
+                  </p>
+                </motion.div>
               )}
             </div>
 
-            {error && <p style={{ color: '#ef4444', marginTop: '20px' }}>{error}</p>}
+            {error && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{ 
+                  color: '#f87171', 
+                  fontSize: '0.85rem', 
+                  marginTop: '20px', 
+                  padding: '12px', 
+                  background: 'rgba(239,68,68,0.1)', 
+                  borderRadius: '12px', 
+                  border: '1px solid rgba(239,68,68,0.2)',
+                  textAlign: 'center'
+                }}
+              >
+                {error}
+              </motion.div>
+            )}
 
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '30px' }}>
-              <FileText size={24} color="var(--text-muted)" />
-              <Music size={24} color="var(--text-muted)" />
-              <Video size={24} color="var(--text-muted)" />
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              gap: '32px', 
+              marginTop: '40px',
+              paddingTop: '32px',
+              borderTop: '1px solid rgba(255,255,255,0.05)'
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(248, 113, 113, 0.1)' }}>
+                  <FileText size={20} color="#f87171" />
+                </div>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>PDF</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(251, 191, 36, 0.1)' }}>
+                  <Music size={20} color="#fbbf24" />
+                </div>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>AUDIO</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(52, 211, 153, 0.1)' }}>
+                  <Video size={20} color="#34d399" />
+                </div>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>VIDEO</span>
+              </div>
             </div>
           </motion.div>
         </div>
