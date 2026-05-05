@@ -36,7 +36,7 @@ def process_file_content(file_id, content, file_type):
     embeddings = DeterministicFakeEmbedding(size=768)
     vector_store = FAISS.from_texts(texts, embeddings)
 
-    store_path = f"vector_stores/{file_id}"
+    store_path = f"/tmp/vector_stores/{file_id}"
     os.makedirs(store_path, exist_ok=True)
     vector_store.save_local(store_path)
 
@@ -45,7 +45,7 @@ def process_file_content(file_id, content, file_type):
 def get_answer(file_id, question):
     embeddings = DeterministicFakeEmbedding(size=768)
     vector_store = FAISS.load_local(
-        f"vector_stores/{file_id}",
+        f"/tmp/vector_stores/{file_id}",
         embeddings,
         allow_dangerous_deserialization=True
     )

@@ -71,7 +71,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
 
 # --- FILES ---
 
-UPLOAD_DIR = "uploads"
+UPLOAD_DIR = "/tmp/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post("/upload")
